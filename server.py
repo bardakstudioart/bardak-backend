@@ -323,12 +323,16 @@ def ig_profile():
     if not token:
         return jsonify({"ok": False, "error": "token required"}), 400
     
+    # Just get id - username deprecated in v2.0+
     resp = requests.get(f"https://graph.facebook.com/v19.0/me", params={
-        "fields": "id,username",
+        "fields": "id,name",
         "access_token": token
     })
     result = resp.json()
     print(f"IG profile result: {result}")
+    # Map 'name' to 'username' for frontend compatibility
+    if "id" in result and "name" in result:
+        result["username"] = result["name"]
     return jsonify(result)
 
 
