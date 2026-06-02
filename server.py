@@ -320,3 +320,13 @@ def ig_profile():
         "access_token": token
     })
     return jsonify(resp.json())
+
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))
+    print("🚀 Bardak Studio Backend запущен!")
+    print(f"   Bardak Telegram: {'✅' if BOTS['bardak']['token'] else '❌'}")
+    print(f"   SealMary Telegram: {'✅' if BOTS['sealmary']['token'] else '❌'}")
+    print(f"   Bardak Instagram: {'✅' if INSTAGRAM['bardak']['access_token'] else '❌'}")
+    print(f"   URL: http://localhost:{port}")
+    app.run(host="0.0.0.0", debug=False, port=port)
