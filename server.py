@@ -160,7 +160,7 @@ if __name__ == "__main__":
     print(f"   Bardak bot: {'✅' if BOTS['bardak']['token'] else '❌ не настроен'}")
     print(f"   SealMary bot: {'✅' if BOTS['sealmary']['token'] else '❌ не настроен'}")
     print("   URL: http://localhost:5000")
-    app.run(debug=True, port=5000)
+    
 
 
 # ===== INSTAGRAM =====
@@ -328,5 +328,5 @@ if __name__ == "__main__":
     print(f"   Bardak Telegram: {'✅' if BOTS['bardak']['token'] else '❌'}")
     print(f"   SealMary Telegram: {'✅' if BOTS['sealmary']['token'] else '❌'}")
     print(f"   Bardak Instagram: {'✅' if INSTAGRAM['bardak']['access_token'] else '❌'}")
-    print(f"   URL: http://localhost:{port}")
+    print(f"   URL: http://0.0.0.0:{port}")
     app.run(host="0.0.0.0", debug=False, port=port)
