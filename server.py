@@ -324,7 +324,7 @@ def ig_profile():
         return jsonify({"ok": False, "error": "token required"}), 400
     
     resp = requests.get(f"https://graph.facebook.com/v19.0/me", params={
-        "fields": "id,username,account_type",
+        "fields": "id,username",
         "access_token": token
     })
     result = resp.json()
