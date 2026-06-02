@@ -279,10 +279,13 @@ def publish_to_instagram(ig_config: dict, text: str, photos: list) -> dict:
 
 @app.route("/publish/instagram", methods=["POST"])
 def publish_instagram():
-    data = request.json
-    account_key = data.get("account", "bardak")  # "bardak" or "sealmary" or "both"
+    data = request.json or {}
+    account_key = data.get("account", "bardak")
     text = data.get("text", "")
     photos = data.get("photos", [])
+    # Allow token/user_id override from frontend
+    token_override = data.get("token", "")
+    user_id_override = data.get("user_id", "")
     
     if not photos:
         return jsonify({"ok": False, "error": "No photos — Instagram requires at least 1 photo"}), 400
@@ -291,17 +294,22 @@ def publish_instagram():
     targets = ["bardak", "sealmary"] if account_key == "both" else [account_key]
     
     for target in targets:
-        ig = INSTAGRAM.get(target)
+        ig = dict(INSTAGRAM.get(target, {}))
         if not ig:
             results.append({"account": target, "ok": False, "error": "Unknown account"})
             continue
+        # Use override tokens if provided
+        if token_override and target == account_key:
+            ig["access_token"] = token_override
+        if user_id_override and target == account_key:
+            ig["ig_user_id"] = user_id_override
         try:
             result = publish_to_instagram(ig, text, photos)
             result["account"] = target
-            result["name"] = ig["name"]
+            result["name"] = ig.get("name", target)
             results.append(result)
         except Exception as e:
-            results.append({"account": target, "ok": False, "error": str(e), "name": ig["name"]})
+            results.append({"account": target, "ok": False, "error": str(e), "name": ig.get("name", target)})
     
     all_ok = all(r.get("ok") for r in results)
     return jsonify({"ok": all_ok, "results": results})
@@ -310,16 +318,18 @@ def publish_instagram():
 @app.route("/ig/profile", methods=["POST"])
 def ig_profile():
     """Get Instagram user ID from access token"""
-    data = request.json
-    token = data.get("token", "")
+    data = request.json or {}
+    token = data.get("token", "") or INSTAGRAM["bardak"]["access_token"]
     if not token:
         return jsonify({"ok": False, "error": "token required"}), 400
     
-    resp = requests.get(f"{IG_API}/me", params={
+    resp = requests.get(f"https://graph.facebook.com/v19.0/me", params={
         "fields": "id,username,account_type",
         "access_token": token
     })
-    return jsonify(resp.json())
+    result = resp.json()
+    print(f"IG profile result: {result}")
+    return jsonify(result)
 
 
 if __name__ == "__main__":
